@@ -64,13 +64,30 @@ final class Expression
         '&' => ['prefix' => '&', 'joiner' => '&', 'query' => true],
     ];
 
-    private string $operator;
-    /** @var array<VarSpecifier> */
-    private array $varSpecifiers;
-    private string $joiner;
-    /** @var array<string> */
-    private array $variableNames;
-    private string $expressionString;
+    /**
+     * @var string
+     */
+    private $operator;
+
+    /**
+     * @var string
+     */
+    private $joiner;
+
+    /**
+     * @var array<VarSpecifier>
+     */
+    private $varSpecifiers;
+
+    /**
+     * @var array<string>
+     */
+    private $variableNames;
+
+    /**
+     * @var string
+     */
+    private $expressionString;
 
     private function __construct(string $operator, VarSpecifier ...$varSpecifiers)
     {
@@ -86,18 +103,20 @@ final class Expression
      */
     private function setVariableNames(): array
     {
-        return array_unique(array_map(
-            static fn (VarSpecifier $varSpecifier): string => $varSpecifier->name(),
-            $this->varSpecifiers
-        ));
+        $mapper = static function (VarSpecifier $varSpecifier): string {
+            return $varSpecifier->name();
+        };
+
+        return array_unique(array_map($mapper, $this->varSpecifiers));
     }
 
     private function setExpressionString(): string
     {
-        $varSpecifierString = implode(',', array_map(
-            static fn (VarSpecifier $variable): string => $variable->toString(),
-            $this->varSpecifiers
-        ));
+        $mapper = static function (VarSpecifier $variable): string {
+            return $variable->toString();
+        };
+
+        $varSpecifierString = implode(',', array_map($mapper, $this->varSpecifiers));
 
         return '{'.$this->operator.$varSpecifierString.'}';
     }
@@ -127,10 +146,11 @@ final class Expression
             throw new SyntaxError('The operator used in the expression "'.$expression.'" is reserved.');
         }
 
-        return new Expression($parts['operator'], ...array_map(
-            static fn (string $varSpec): VarSpecifier => VarSpecifier::createFromString($varSpec),
-            explode(',', $parts['variables'])
-        ));
+        $mapper = static function (string $varSpec): VarSpecifier {
+            return VarSpecifier::createFromString($varSpec);
+        };
+
+        return new Expression($parts['operator'], ...array_map($mapper, explode(',', $parts['variables'])));
     }
 
     /**
@@ -157,7 +177,11 @@ final class Expression
             $parts[] = $this->replace($varSpecifier, $variables);
         }
 
-        $expanded = implode($this->joiner, array_filter($parts, static fn ($value): bool => '' !== $value));
+        $nullFilter = static function ($value): bool {
+            return '' !== $value;
+        };
+
+        $expanded = implode($this->joiner, array_filter($parts, $nullFilter));
         if ('' === $expanded) {
             return $expanded;
         }

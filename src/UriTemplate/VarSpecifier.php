@@ -28,9 +28,20 @@ final class VarSpecifier
         (?<modifier>\:(?<position>\d+)|\*)?
     $/x';
 
-    private string $name;
-    private string $modifier;
-    private int $position;
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var string
+     */
+    private $modifier;
+
+    /**
+     * @var int
+     */
+    private $position;
 
     private function __construct(string $name, string $modifier, int $position)
     {

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri;
 
-use JsonSerializable;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\SyntaxError;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
@@ -22,10 +21,16 @@ use function is_scalar;
 use function method_exists;
 use function sprintf;
 
-final class Http implements Psr7UriInterface, JsonSerializable
+final class Http implements Psr7UriInterface, \JsonSerializable
 {
-    private UriInterface $uri;
+    /**
+     * @var UriInterface
+     */
+    private $uri;
 
+    /**
+     * New instance.
+     */
     private function __construct(UriInterface $uri)
     {
         $this->validate($uri);
@@ -183,7 +188,6 @@ final class Http implements Psr7UriInterface, JsonSerializable
      */
     public function withScheme($scheme): self
     {
-        /** @var string $scheme */
         $scheme = $this->filterInput($scheme);
         if ('' === $scheme) {
             $scheme = null;
@@ -220,7 +224,6 @@ final class Http implements Psr7UriInterface, JsonSerializable
      */
     public function withUserInfo($user, $password = null): self
     {
-        /** @var string $user */
         $user = $this->filterInput($user);
         if ('' === $user) {
             $user = null;
@@ -239,7 +242,6 @@ final class Http implements Psr7UriInterface, JsonSerializable
      */
     public function withHost($host): self
     {
-        /** @var string $host */
         $host = $this->filterInput($host);
         if ('' === $host) {
             $host = null;
@@ -284,7 +286,6 @@ final class Http implements Psr7UriInterface, JsonSerializable
      */
     public function withQuery($query): self
     {
-        /** @var string $query */
         $query = $this->filterInput($query);
         if ('' === $query) {
             $query = null;
@@ -303,7 +304,6 @@ final class Http implements Psr7UriInterface, JsonSerializable
      */
     public function withFragment($fragment): self
     {
-        /** @var string $fragment */
         $fragment = $this->filterInput($fragment);
         if ('' === $fragment) {
             $fragment = null;

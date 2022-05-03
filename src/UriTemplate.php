@@ -19,7 +19,6 @@ use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Exceptions\TemplateCanNotBeExpanded;
 use League\Uri\UriTemplate\Template;
 use League\Uri\UriTemplate\VariableBag;
-use TypeError;
 
 /**
  * Defines the URI Template syntax and the process for expanding a URI Template into a URI reference.
@@ -34,13 +33,20 @@ use TypeError;
  */
 final class UriTemplate
 {
-    private Template $template;
-    private VariableBag $defaultVariables;
+    /**
+     * @var Template
+     */
+    private $template;
+
+    /**
+     * @var VariableBag
+     */
+    private $defaultVariables;
 
     /**
      * @param object|string $template a string or an object with the __toString method
      *
-     * @throws TypeError                if the template is not a string or an object with the __toString method
+     * @throws \TypeError               if the template is not a string or an object with the __toString method
      * @throws SyntaxError              if the template syntax is invalid
      * @throws TemplateCanNotBeExpanded if the template variables are invalid
      */
@@ -113,10 +119,10 @@ final class UriTemplate
      */
     public function withDefaultVariables(array $defaultDefaultVariables): self
     {
-        return new self(
-            $this->template->toString(),
-            $this->filterVariables($defaultDefaultVariables)->all()
-        );
+        $clone = clone $this;
+        $clone->defaultVariables = $this->filterVariables($defaultDefaultVariables);
+
+        return $clone;
     }
 
     /**
@@ -125,10 +131,10 @@ final class UriTemplate
      */
     public function expand(array $variables = []): UriInterface
     {
-        return Uri::createFromString(
-            $this->template->expand(
-                $this->filterVariables($variables)->replace($this->defaultVariables)
-            )
+        $uriString = $this->template->expand(
+            $this->filterVariables($variables)->replace($this->defaultVariables)
         );
+
+        return Uri::createFromString($uriString);
     }
 }

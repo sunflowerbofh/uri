@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri;
 
-use finfo;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\FileinfoSupportMissing;
 use League\Uri\Exceptions\IdnaConversionFailed;
@@ -21,7 +20,6 @@ use League\Uri\Exceptions\IdnSupportMissing;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Idna\Idna;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
-use TypeError;
 use function array_filter;
 use function array_map;
 use function base64_decode;
@@ -159,10 +157,11 @@ final class Uri implements UriInterface
      */
     private const REGEXP_WINDOW_PATH = ',^(?<root>[a-zA-Z][:|\|]),';
 
+
     /**
      * Supported schemes and corresponding default port.
      *
-     * @var array<string, int|null>
+     * @var array
      */
     private const SCHEME_DEFAULT_PORT = [
         'data' => null,
@@ -178,7 +177,7 @@ final class Uri implements UriInterface
     /**
      * URI validation methods per scheme.
      *
-     * @var array<string>
+     * @var array
      */
     private const SCHEME_VALIDATION_METHOD = [
         'data' => 'isUriWithSchemeAndPathOnly',
@@ -198,16 +197,80 @@ final class Uri implements UriInterface
      */
     private const ASCII = "\x20\x65\x69\x61\x73\x6E\x74\x72\x6F\x6C\x75\x64\x5D\x5B\x63\x6D\x70\x27\x0A\x67\x7C\x68\x76\x2E\x66\x62\x2C\x3A\x3D\x2D\x71\x31\x30\x43\x32\x2A\x79\x78\x29\x28\x4C\x39\x41\x53\x2F\x50\x22\x45\x6A\x4D\x49\x6B\x33\x3E\x35\x54\x3C\x44\x34\x7D\x42\x7B\x38\x46\x77\x52\x36\x37\x55\x47\x4E\x3B\x4A\x7A\x56\x23\x48\x4F\x57\x5F\x26\x21\x4B\x3F\x58\x51\x25\x59\x5C\x09\x5A\x2B\x7E\x5E\x24\x40\x60\x7F\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F";
 
-    private ?string $scheme;
-    private ?string $user_info;
-    private ?string $host;
-    private ?int $port;
-    private ?string $authority;
-    private string $path = '';
-    private ?string $query;
-    private ?string $fragment;
-    private ?string $uri;
+    /**
+     * URI scheme component.
+     *
+     * @var string|null
+     */
+    private $scheme;
 
+    /**
+     * URI user info part.
+     *
+     * @var string|null
+     */
+    private $user_info;
+
+    /**
+     * URI host component.
+     *
+     * @var string|null
+     */
+    private $host;
+
+    /**
+     * URI port component.
+     *
+     * @var int|null
+     */
+    private $port;
+
+    /**
+     * URI authority string representation.
+     *
+     * @var string|null
+     */
+    private $authority;
+
+    /**
+     * URI path component.
+     *
+     * @var string
+     */
+    private $path = '';
+
+    /**
+     * URI query component.
+     *
+     * @var string|null
+     */
+    private $query;
+
+    /**
+     * URI fragment component.
+     *
+     * @var string|null
+     */
+    private $fragment;
+
+    /**
+     * URI string representation.
+     *
+     * @var string|null
+     */
+    private $uri;
+
+    /**
+     * Create a new instance.
+     *
+     * @param ?string $scheme
+     * @param ?string $user
+     * @param ?string $pass
+     * @param ?string $host
+     * @param ?int    $port
+     * @param ?string $query
+     * @param ?string $fragment
+     */
     private function __construct(
         ?string $scheme,
         ?string $user,
@@ -232,7 +295,8 @@ final class Uri implements UriInterface
     /**
      * Format the Scheme and Host component.
      *
-     * @param  ?string     $scheme
+     * @param ?string $scheme
+     *
      * @throws SyntaxError if the scheme is invalid
      */
     private function formatScheme(?string $scheme): ?string
@@ -251,6 +315,7 @@ final class Uri implements UriInterface
 
     /**
      * Set the UserInfo component.
+     *
      * @param ?string $user
      * @param ?string $password
      */
@@ -281,6 +346,7 @@ final class Uri implements UriInterface
 
     /**
      * Validate and Format the Host component.
+     *
      * @param ?string $host
      */
     private function formatHost(?string $host): ?string
@@ -365,7 +431,7 @@ final class Uri implements UriInterface
     /**
      * Format the Port component.
      *
-     * @param object|null|int|string $port
+     * @param null|mixed $port
      *
      * @throws SyntaxError
      */
@@ -376,7 +442,7 @@ final class Uri implements UriInterface
         }
 
         if (!is_int($port) && !(is_string($port) && 1 === preg_match('/^\d*$/', $port))) {
-            throw new SyntaxError('The port is expected to be an integer or a string representing an integer; '.gettype($port).' given.');
+            throw new SyntaxError(sprintf('The port `%s` is invalid', $port));
         }
 
         $port = (int) $port;
@@ -480,8 +546,12 @@ final class Uri implements UriInterface
     }
 
     /**
-     * Create a new instance from a hash representation of the URI similar
-     * to PHP parse_url function result.
+     * Create a new instance from a hash of parse_url parts.
+     *
+     * Create an new instance from a hash representation of the URI similar
+     * to PHP parse_url function result
+     *
+     * @param array<string, mixed> $components
      */
     public static function createFromComponents(array $components = []): self
     {
@@ -513,7 +583,7 @@ final class Uri implements UriInterface
     public static function createFromDataPath(string $path, $context = null): self
     {
         static $finfo_support = null;
-        $finfo_support = $finfo_support ?? class_exists(finfo::class);
+        $finfo_support = $finfo_support ?? class_exists(\finfo::class);
 
         // @codeCoverageIgnoreStart
         if (!$finfo_support) {
@@ -533,7 +603,7 @@ final class Uri implements UriInterface
             throw new SyntaxError(sprintf('The file `%s` does not exist or is not readable', $path));
         }
 
-        $mimetype = (string) (new finfo(FILEINFO_MIME))->file(...$mime_args);
+        $mimetype = (string) (new \finfo(FILEINFO_MIME))->file(...$mime_args);
 
         return Uri::createFromComponents([
             'scheme' => 'data',
@@ -610,7 +680,7 @@ final class Uri implements UriInterface
         }
 
         if (!$uri instanceof Psr7UriInterface) {
-            throw new TypeError(sprintf('The object must implement the `%s` or the `%s`', Psr7UriInterface::class, UriInterface::class));
+            throw new \TypeError(sprintf('The object must implement the `%s` or the `%s`', Psr7UriInterface::class, UriInterface::class));
         }
 
         $scheme = $uri->getScheme();
@@ -717,7 +787,7 @@ final class Uri implements UriInterface
      *
      * @throws SyntaxError If the host can not be detected
      *
-     * @return array{0:string|null, 1:int|null}
+     * @return array{0:?string, 1:?string}
      */
     private static function fetchHostname(array $server): array
     {
@@ -727,13 +797,9 @@ final class Uri implements UriInterface
         }
 
         if (isset($server['HTTP_HOST']) && 1 === preg_match(self::REGEXP_HOST_PORT, $server['HTTP_HOST'], $matches)) {
-            if (isset($matches['port'])) {
-                $matches['port'] = (int) $matches['port'];
-            }
-
             return [
                 $matches['host'],
-                $matches['port'] ?? $server['SERVER_PORT'],
+                isset($matches['port']) ? (int) $matches['port'] : $server['SERVER_PORT'],
             ];
         }
 
@@ -1199,7 +1265,7 @@ final class Uri implements UriInterface
         }
 
         if (!is_scalar($str)) {
-            throw new TypeError(sprintf('The component must be a string, a scalar or a stringable object %s given.', gettype($str)));
+            throw new \TypeError(sprintf('The component must be a string, a scalar or a stringable object %s given.', gettype($str)));
         }
 
         $str = (string) $str;
@@ -1275,14 +1341,12 @@ final class Uri implements UriInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @param string|object $path
      */
     public function withPath($path): UriInterface
     {
         $path = $this->filterString($path);
         if (null === $path) {
-            throw new TypeError('A path must be a string NULL given.');
+            throw new \TypeError('A path must be a string NULL given.');
         }
 
         $path = $this->formatPath($path);

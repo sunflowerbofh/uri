@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace League\Uri\UriTemplate;
 
 use League\Uri\Exceptions\TemplateCanNotBeExpanded;
-use TypeError;
 use function gettype;
 use function is_array;
 use function is_bool;
@@ -28,10 +27,10 @@ final class VariableBag
     /**
      * @var array<string,string|array<string>>
      */
-    private array $variables = [];
+    private $variables = [];
 
     /**
-     * @param iterable<string,string|bool|int|float|array<string|bool|int|float>> $variables
+     * @param iterable<string,mixed> $variables
      */
     public function __construct(iterable $variables = [])
     {
@@ -64,7 +63,7 @@ final class VariableBag
     }
 
     /**
-     * @param string|bool|int|float|array<string|bool|int|float> $value
+     * @param string|array<string> $value
      */
     public function assign(string $name, $value): void
     {
@@ -89,7 +88,7 @@ final class VariableBag
         }
 
         if (!is_array($value)) {
-            throw new TypeError(sprintf('The variable '.$name.' must be NULL, a scalar or a stringable object `%s` given', gettype($value)));
+            throw new \TypeError(sprintf('The variable '.$name.' must be NULL, a scalar or a stringable object `%s` given', gettype($value)));
         }
 
         if (!$isNestedListAllowed) {
@@ -109,6 +108,9 @@ final class VariableBag
      */
     public function replace(VariableBag $variables): self
     {
-        return new self($this->variables + $variables->variables);
+        $instance = clone $this;
+        $instance->variables += $variables->variables;
+
+        return $instance;
     }
 }
