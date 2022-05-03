@@ -1,0 +1,35 @@
+Source: thephpleague-uri
+Section: php
+Priority: optional
+Maintainer: Katharina Drexel <katharina.drexel@bfh.ch>
+Build-Depends:
+ debhelper-compat (= 13),
+ phpab,
+ pkg-php-tools,
+Standards-Version: 4.6.1
+Homepage: https://github.com/thephpleague/uri
+Vcs-Browser: https://github.com/thephpleague/uri
+Vcs-Git: https://github.com/thephpleague/uri.git
+Rules-Requires-Root: no
+
+Package: php-league-uri
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${phpcomposer:Debian-require},
+Suggests:
+ ${phpcomposer:Debian-suggest},
+Replaces:
+ ${phpcomposer:Debian-replace},
+Breaks:
+ ${phpcomposer:Debian-conflict},
+Provides:
+ ${phpcomposer:Debian-provide},
+Description: Provides simple and intuitive classes to manage URIs in PHP
+ The Uri package provides simple and intuitive classes to manage URIs in PHP.
+ You will be able to
+  * parse, build and resolve URIs
+  * create URIs from different sources (string, PHP environment, base URI,
+    URI template, ...)
+  * handle internalisation
+  * infer properties and features from URIs

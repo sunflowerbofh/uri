@@ -1,0 +1,5 @@
+thephpleague-uri (6.5.0-1) unstable; urgency=medium
+
+  * Initial release (Closes: #1012442).
+
+ -- Katharina Drexel <katharina.drexel@bfh.ch>  Tue, 03 May 2022 08:30:02 +0200
