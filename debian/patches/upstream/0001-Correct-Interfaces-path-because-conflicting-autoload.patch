@@ -1,0 +1,85 @@
+From: Katharina Drexel <katharina.drexel@bfh.ch>
+Date: Thu, 12 May 2022 10:51:25 +0200
+Subject: Adopt class paths to php-league-uri-interfaces
+
+diff --git a/src/Http.php b/src/Http.php
+index 2bbd8a7..1aa5980 100644
+--- a/src/Http.php
++++ b/src/Http.php
+@@ -13,8 +13,8 @@ declare(strict_types=1);
+ 
+ namespace League\Uri;
+ 
+-use League\Uri\Contracts\UriInterface;
+-use League\Uri\Exceptions\SyntaxError;
++use League\Uri\Interfaces\Contracts\UriInterface;
++use League\Uri\Interfaces\Exceptions\SyntaxError;
+ use Psr\Http\Message\UriInterface as Psr7UriInterface;
+ use function is_object;
+ use function is_scalar;
+diff --git a/src/Uri.php b/src/Uri.php
+index 89f9aa1..30ca3bb 100644
+--- a/src/Uri.php
++++ b/src/Uri.php
+@@ -13,12 +13,12 @@ declare(strict_types=1);
+ 
+ namespace League\Uri;
+ 
+-use League\Uri\Contracts\UriInterface;
+-use League\Uri\Exceptions\FileinfoSupportMissing;
+-use League\Uri\Exceptions\IdnaConversionFailed;
+-use League\Uri\Exceptions\IdnSupportMissing;
+-use League\Uri\Exceptions\SyntaxError;
+-use League\Uri\Idna\Idna;
++use League\Uri\Interfaces\Contracts\UriInterface;
++use League\Uri\Interfaces\Exceptions\FileinfoSupportMissing;
++use League\Uri\Interfaces\Exceptions\IdnaConversionFailed;
++use League\Uri\Interfaces\Exceptions\IdnSupportMissing;
++use League\Uri\Interfaces\Exceptions\SyntaxError;
++use League\Uri\Interfaces\Idna\Idna;
+ use Psr\Http\Message\UriInterface as Psr7UriInterface;
+ use function array_filter;
+ use function array_map;
+diff --git a/src/UriInfo.php b/src/UriInfo.php
+index 5dd96e1..c265291 100644
+--- a/src/UriInfo.php
++++ b/src/UriInfo.php
+@@ -13,7 +13,7 @@ declare(strict_types=1);
+ 
+ namespace League\Uri;
+ 
+-use League\Uri\Contracts\UriInterface;
++use League\Uri\Interfaces\Contracts\UriInterface;
+ use Psr\Http\Message\UriInterface as Psr7UriInterface;
+ use function explode;
+ use function implode;
+diff --git a/src/UriResolver.php b/src/UriResolver.php
+index 7c34dbe..6678cd3 100644
+--- a/src/UriResolver.php
++++ b/src/UriResolver.php
+@@ -13,7 +13,7 @@ declare(strict_types=1);
+ 
+ namespace League\Uri;
+ 
+-use League\Uri\Contracts\UriInterface;
++use League\Uri\Interfaces\Contracts\UriInterface;
+ use Psr\Http\Message\UriInterface as Psr7UriInterface;
+ use function array_pop;
+ use function array_reduce;
+diff --git a/src/UriTemplate.php b/src/UriTemplate.php
+index 94bbef9..23aee8d 100644
+--- a/src/UriTemplate.php
++++ b/src/UriTemplate.php
+@@ -13,9 +13,9 @@ declare(strict_types=1);
+ 
+ namespace League\Uri;
+ 
+-use League\Uri\Contracts\UriException;
+-use League\Uri\Contracts\UriInterface;
+-use League\Uri\Exceptions\SyntaxError;
++use League\Uri\Interfaces\Contracts\UriException;
++use League\Uri\Interfaces\Contracts\UriInterface;
++use League\Uri\Interfaces\Exceptions\SyntaxError;
+ use League\Uri\Exceptions\TemplateCanNotBeExpanded;
+ use League\Uri\UriTemplate\Template;
+ use League\Uri\UriTemplate\VariableBag;
